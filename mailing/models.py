@@ -56,7 +56,7 @@ class MailingMessage(models.Model):
 
 
 class MailingLogs(models.Model):
-    attempt_time = models.DateTimeField(auto_now_add=True, verbose_name='время попытки')
+    attempt_time = models.DateTimeField(verbose_name='время попытки')
     attempt_status = models.BooleanField(default=False, verbose_name='статус')
     server_response = models.CharField(max_length=50, verbose_name='ответ сервера', **NULLABLE)
 
