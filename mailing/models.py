@@ -34,6 +34,7 @@ class Mailing(models.Model):
                                  default = '0', verbose_name='периодичность')
     status = models.CharField(max_length=15, choices=STATUS_CHOICES,
                               default='0', verbose_name='статус')
+    message = models.ForeignKey("MailingMessage", on_delete=models.CASCADE)
 
     def __str__(self):
         return f'{self.pk} {self.status}'
@@ -59,6 +60,7 @@ class MailingLogs(models.Model):
     attempt_time = models.DateTimeField(verbose_name='время попытки')
     attempt_status = models.BooleanField(default=False, verbose_name='статус')
     server_response = models.CharField(max_length=50, verbose_name='ответ сервера', **NULLABLE)
+    mailing = models.ForeignKey("Mailing", on_delete=models.CASCADE)
 
     def __str__(self):
         status = 'success' if self.attempt_status else 'fail'
