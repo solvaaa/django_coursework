@@ -9,9 +9,9 @@
 </div>
 <div class="card-footer">
     <div class="btn-group">
-        <a href=""
+        <a href="{% url 'mailing:edit' object.pk %}"
            class="btn btn-sm btn-outline-secondary" type="button">Edit</a>
-        <a href=""
+        <a href="{% url 'mailing:delete' object.pk %}"
            class="btn btn-sm btn-outline-secondary" type="button">Delete</a>
     </div>
 </div>
