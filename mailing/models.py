@@ -2,17 +2,6 @@ from django.db import models
 
 # Create your models here.
 NULLABLE = {'blank': True, 'null': True}
-FREQUENCY_CHOICES = (
-    ('0', 'не повторять'),
-    ('1', 'ежедневно'),
-    ('2', 'еженедельно'),
-    ('3', 'ежемесячно')
-)
-STATUS_CHOICES = (
-    ('0', 'создана'),
-    ('1', 'запущена'),
-    ('2', 'завершена')
-)
 
 
 class Client(models.Model):
@@ -29,11 +18,31 @@ class Client(models.Model):
 
 
 class Mailing(models.Model):
+    ONCE = 'ONCE'
+    DAILY = 'DAILY'
+    WEEKLY = 'WEEKLY'
+    MONTHLY = 'MONTHLY'
+    FREQUENCY_CHOICES = (
+        (ONCE, 'не повторять'),
+        (DAILY, 'ежедневно'),
+        (WEEKLY, 'еженедельно'),
+        (MONTHLY, 'ежемесячно')
+    )
+
+    CREATED = "CREAT"
+    STARTED = "START"
+    FINISHED = "FIN"
+    STATUS_CHOICES = (
+        (CREATED, 'создана'),
+        (STARTED, 'запущена'),
+        (FINISHED, 'завершена')
+    )
+
     mailing_time = models.TimeField(auto_now_add=True, verbose_name='время')
     frequency = models.CharField(max_length=15, choices=FREQUENCY_CHOICES,
-                                 default = '0', verbose_name='периодичность')
+                                 default=ONCE, verbose_name='периодичность')
     status = models.CharField(max_length=15, choices=STATUS_CHOICES,
-                              default='0', verbose_name='статус')
+                              default=CREATED, verbose_name='статус')
     message = models.ForeignKey("MailingMessage", on_delete=models.CASCADE)
 
     def __str__(self):
