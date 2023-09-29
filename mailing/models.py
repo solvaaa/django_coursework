@@ -38,7 +38,7 @@ class Mailing(models.Model):
         (FINISHED, 'завершена')
     )
 
-    mailing_time = models.TimeField(auto_now_add=True, verbose_name='время')
+    mailing_time = models.TimeField(verbose_name='время')
     frequency = models.CharField(max_length=15, choices=FREQUENCY_CHOICES,
                                  default=ONCE, verbose_name='периодичность')
     status = models.CharField(max_length=15, choices=STATUS_CHOICES,
