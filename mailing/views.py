@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.views.generic import TemplateView, ListView
+from django.views.generic import TemplateView, ListView, DetailView
 
 from mailing.models import Mailing
 
@@ -15,3 +15,10 @@ class IndexView(TemplateView):
 
 class MailingListView(ListView):
     model = Mailing
+
+
+class MailingDetailView(DetailView):
+    model = Mailing
+
+
+

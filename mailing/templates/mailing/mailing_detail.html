@@ -1,0 +1,18 @@
+{% extends 'mailing/base.html' %}
+{% block content %}
+<div class="card-body">
+    <h3 class="card-title pricing-card-title">{{ object.pk }}</h3>
+    <p>Время {{ object.mailing_time }}</p>
+    <p>Статус {{ object.status }}</p>
+    <p>Частота {{ object.frequency }}</p>
+    <p>{{ object.message }}</p>
+</div>
+<div class="card-footer">
+    <div class="btn-group">
+        <a href=""
+           class="btn btn-sm btn-outline-secondary" type="button">Edit</a>
+        <a href=""
+           class="btn btn-sm btn-outline-secondary" type="button">Delete</a>
+    </div>
+</div>
+{% endblock %}
