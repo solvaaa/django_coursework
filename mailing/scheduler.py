@@ -26,7 +26,7 @@ def delete_old_job_executions(max_age=604_800):
 def start():
 
     scheduler.add_jobstore(DjangoJobStore(), "default")
-
+    DjangoJobStore().remove_job(job_id='30')
     try:
         print("Starting scheduler...")
         scheduler.start()
