@@ -1,10 +1,18 @@
+from apscheduler.schedulers.blocking import BlockingScheduler
+from apscheduler.triggers.cron import CronTrigger
 from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView, ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.conf import settings
+from django_apscheduler.jobstores import DjangoJobStore, register_job
+from mailing.scheduler import scheduler
 
 from mailing.forms import MailingForm, ClientForm, MessageForm
 from mailing.models import Mailing, Client, MailingMessage, MailingLogs
 
+
+def my_job():
+    print("SECOND JOB")
 
 # Create your views here.
 class MailingListView(ListView):
@@ -23,6 +31,35 @@ class MailingCreateView(CreateView):
     }
     form_class = MailingForm
     success_url = reverse_lazy('mailing:mailing_list')
+
+    def form_valid(self, form):
+        frequencies = {
+            'ONCE': 'ONCE',
+            'DAILY': 'DAILY',
+            'WEEKLY': 'WEEKLY',
+            'MONTHLY': 'MONTHLY'
+        }
+        response = super().form_valid(form)
+        job_id = str(form.instance.pk)
+        time = form.cleaned_data['mailing_time']
+        frequency = form.cleaned_data['frequency']
+        scheduler_frequency = frequencies[frequency]
+        message = form.instance.message
+        email_list = []
+        for client in form.cleaned_data['clients']:
+            email_list.append(client.email)
+        print(message.subject, message.body)
+        print(email_list)
+
+
+        '''scheduler.add_job(
+            my_job,
+            trigger=CronTrigger(second="*/10"),  # Every 10 seconds
+            id=job_id,  # The `id` assigned to each job MUST be unique
+            max_instances=1,
+            replace_existing=True,
+        )'''
+        return response
 
 
 class MailingUpdateView(UpdateView):

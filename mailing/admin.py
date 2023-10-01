@@ -12,6 +12,7 @@ class ClientAdmin(admin.ModelAdmin):
 @admin.register(model.Mailing)
 class MailingAdmin(admin.ModelAdmin):
     list_display = ('mailing_time', 'frequency', 'status')
+    readonly_fields = ('status', )
     list_filter = ('frequency', 'status')
 
 
