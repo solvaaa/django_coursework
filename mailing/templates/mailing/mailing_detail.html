@@ -1,11 +1,12 @@
 {% extends 'mailing/base.html' %}
 {% block content %}
 <div class="card-body">
-    <h3 class="card-title pricing-card-title">{{ object.pk }}</h3>
+    <h3 class="card-title pricing-card-title">{{ object.name }}</h3>
     <p>Время {{ object.mailing_time }}</p>
     <p>Статус {{ object.status }}</p>
     <p>Частота {{ object.frequency }}</p>
     <p>{{ object.message }}</p>
+    <p>{{ object.clients }}</p>
 </div>
 <div class="card-footer">
     <div class="btn-group">

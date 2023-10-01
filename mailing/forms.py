@@ -8,6 +8,11 @@ class MailingForm(forms.ModelForm):
         model = Mailing
         fields = '__all__'
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["clients"].widget = forms.widgets.CheckboxSelectMultiple()
+        self.fields["clients"].queryset = Client.objects.all()
+
 
 class ClientForm(forms.ModelForm):
 

@@ -38,12 +38,14 @@ class Mailing(models.Model):
         (FINISHED, 'завершена')
     )
 
+    name = models.CharField(max_length=100, verbose_name='название')
     mailing_time = models.TimeField(verbose_name='время')
     frequency = models.CharField(max_length=15, choices=FREQUENCY_CHOICES,
                                  default=ONCE, verbose_name='периодичность')
     status = models.CharField(max_length=15, choices=STATUS_CHOICES,
                               default=CREATED, verbose_name='статус')
     message = models.ForeignKey("MailingMessage", on_delete=models.CASCADE)
+    clients = models.ManyToManyField('Client', through='MailingClient', verbose_name='клиенты')
 
     def __str__(self):
         return f'{self.pk} {self.status}'
@@ -54,7 +56,7 @@ class Mailing(models.Model):
 
 
 class MailingMessage(models.Model):
-    subject = models.TextField(verbose_name='тема')
+    subject = models.CharField(max_length=200, verbose_name='тема')
     body = models.TextField(verbose_name='тело', **NULLABLE)
 
     def __str__(self):
@@ -78,3 +80,11 @@ class MailingLogs(models.Model):
     class Meta:
         verbose_name = 'лог'
         verbose_name_plural = 'логи'
+
+
+class MailingClient(models.Model):
+    mailing = models.ForeignKey(Mailing, on_delete=models.CASCADE)
+    client = models.ForeignKey(Client, on_delete=models.SET_NULL, **NULLABLE)
+
+    def __str__(self):
+        return f'{self.mailing}, {self.client}'
