@@ -1,0 +1,31 @@
+{% extends 'mailing/base.html' %}
+{% block content %}
+<div class="row text-center">
+    <div class="col-12">
+        <div class="card mb-4 box-shadow">
+            <div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+                <h1 class="display-4">TestStore</h1>
+                <p class="lead">TestStore - лучший магазин testa</p>
+            </div>
+            {% for object in object_list %}
+                <div class="card-body">
+                    <h4 class="card-title pricing-card-title">{{ object.mailing }}</h4>
+                    <p>Время попытки: {{ object.attempt_time }}</p>
+                    <p>
+                        {% if object.attempt_status %}
+                            Статус: успешно
+                        {% else %}
+                            Статус: не успешно
+                        {% endif %}
+                    </p>
+                    <div class="btn-group">
+                        <a href="{% url 'mailing:log_detail' object.pk %}"
+                            class="btn btn-sm btn-outline-secondary" type="button">View</a>
+                    </div>
+                </div>
+
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

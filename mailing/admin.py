@@ -23,7 +23,7 @@ class MessageAdmin(admin.ModelAdmin):
 
 @admin.register(model.MailingLogs)
 class LogsAdmin(admin.ModelAdmin):
-    readonly_fields = ('attempt_time', 'attempt_status', 'server_response')
+#    readonly_fields = ('attempt_time', 'attempt_status', 'server_response')
     list_display = ('attempt_time', 'attempt_status', 'server_response')
     list_filter = ('attempt_status', 'server_response')
     search_fields = ('attempt_time', )

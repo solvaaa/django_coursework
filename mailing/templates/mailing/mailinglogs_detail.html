@@ -1,0 +1,15 @@
+{% extends 'mailing/base.html' %}
+{% block content %}
+<div class="card-body">
+    <h3 class="card-title pricing-card-title">{{ object.subject }}</h3>
+    <p>Время попытки: {{ object.attempt_time }}</p>
+    <p>
+        {% if object.attempt_status %}
+            Статус: успешно
+        {% else %}
+            Статус: не успешно
+        {% endif %}
+    </p>
+    <p>Ответ сервера: {{ object.server_response }}</p>
+</div>
+{% endblock %}
