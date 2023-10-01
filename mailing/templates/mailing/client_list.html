@@ -1,0 +1,32 @@
+{% extends 'mailing/base.html' %}
+{% block content %}
+<div class="row text-center">
+    <div class="col-12">
+        <div class="card mb-4 box-shadow">
+            <div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+                <h1 class="display-4">TestStore</h1>
+                <p class="lead">TestStore - лучший магазин testa</p>
+            </div>
+            <div class="col-12">
+                <a href="{% url 'mailing:client_create' %}"
+                   class="btn btn-sm btn-outline-secondary">Add client</a>
+            </div>
+            {% for object in object_list %}
+                <div class="card-body">
+                    <h4 class="card-title pricing-card-title">{{ object.name }}</h4>
+                    <p>{{ object.email }}</p>
+                    <div class="btn-group">
+                        <a href="{% url 'mailing:client_detail' object.pk %}"
+                            class="btn btn-sm btn-outline-secondary" type="button">View</a>
+                        <a href="{% url 'mailing:client_edit' object.pk %}"
+                            class="btn btn-sm btn-outline-secondary" type="button">Edit</a>
+                        <a href="{% url 'mailing:client_delete' object.pk %}"
+                            class="btn btn-sm btn-outline-secondary" type="button">Delete</a>
+                    </div>
+                </div>
+
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

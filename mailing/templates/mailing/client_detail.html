@@ -1,0 +1,16 @@
+{% extends 'mailing/base.html' %}
+{% block content %}
+<div class="card-body">
+    <h3 class="card-title pricing-card-title">{{ object.name }}</h3>
+    <p>e-mail: {{ object.email }}</p>
+    <p>Комментарий: {{ object.comment }}</p>
+</div>
+<div class="card-footer">
+    <div class="btn-group">
+        <a href="{% url 'mailing:client_edit' object.pk %}"
+           class="btn btn-sm btn-outline-secondary" type="button">Edit</a>
+        <a href="{% url 'mailing:client_delete' object.pk %}"
+           class="btn btn-sm btn-outline-secondary" type="button">Delete</a>
+    </div>
+</div>
+{% endblock %}

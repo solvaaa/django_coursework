@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+{% extends "mailing/base.html" %}
+
+{% block content %}
+    <div class="col-12">
+        <div class="row">
+            <div class="col-6">
+                <div class="card-body">
+                    <form method="post"+>
+                        {% csrf_token %}
+                        <p>Хотите удалить клиента {{ object.name }}?</p>
+                        <button type="submit" class="btn btn-danger">Подтвердить</button>
+                        <a href="{% url 'mailing:client_list' %}" class="btn btn-warning">Отмена</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+</body>
+</html>
