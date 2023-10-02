@@ -20,10 +20,12 @@
                     <div class="btn-group">
                         <a href="{% url 'mailing:message_detail' object.pk %}"
                             class="btn btn-sm btn-outline-secondary" type="button">View</a>
-                        <a href="{% url 'mailing:message_edit' object.pk %}"
-                            class="btn btn-sm btn-outline-secondary" type="button">Edit</a>
-                        <a href="{% url 'mailing:message_delete' object.pk %}"
-                            class="btn btn-sm btn-outline-secondary" type="button">Delete</a>
+                        {% if not user.is_staff or user.is_superuser %}
+                            <a href="{% url 'mailing:message_edit' object.pk %}"
+                                class="btn btn-sm btn-outline-secondary" type="button">Edit</a>
+                            <a href="{% url 'mailing:message_delete' object.pk %}"
+                                class="btn btn-sm btn-outline-secondary" type="button">Delete</a>
+                        {% endif %}
                     </div>
                 </div>
 

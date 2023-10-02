@@ -1,7 +1,7 @@
 import apscheduler.jobstores.base
 from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.triggers.cron import CronTrigger
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView, ListView, DetailView, CreateView, UpdateView, DeleteView
@@ -33,7 +33,7 @@ class MailingDetailView(DetailView):
     model = Mailing
 
 
-class MailingCreateView(LoginRequiredMixin, CreateView):
+class MailingCreateView(PermissionRequiredMixin, LoginRequiredMixin, CreateView):
     login_url = "users:login"
     redirect_field_name = "redirect_to"
     model = Mailing
@@ -43,6 +43,10 @@ class MailingCreateView(LoginRequiredMixin, CreateView):
     }
     form_class = MailingForm
     success_url = reverse_lazy('mailing:mailing_list')
+
+    def has_permission(self):
+        user = self.request.user
+        return (not user.is_staff) or (user.is_superuser)
 
     def form_valid(self, form):
         if form.is_valid():
@@ -89,7 +93,7 @@ class MailingCreateView(LoginRequiredMixin, CreateView):
         return kwargs
 
 
-class MailingUpdateView(UpdateView):
+class MailingUpdateView(PermissionRequiredMixin, UpdateView):
     model = Mailing
     extra_context = {
         'form_name': 'Редактирование',
@@ -97,6 +101,10 @@ class MailingUpdateView(UpdateView):
     }
     form_class = MailingForm
     success_url = reverse_lazy('mailing:mailing_list')
+
+    def has_permission(self):
+        user = self.request.user
+        return (not user.is_staff) or (user.is_superuser)
 
     def form_valid(self, form):
         if form.is_valid():
@@ -139,9 +147,13 @@ class MailingUpdateView(UpdateView):
         return kwargs
 
 
-class MailingDeleteView(DeleteView):
+class MailingDeleteView(PermissionRequiredMixin, DeleteView):
     model = Mailing
     success_url = reverse_lazy('mailing:mailing_list')
+
+    def has_permission(self):
+        user = self.request.user
+        return (not user.is_staff) or (user.is_superuser)
 
     def form_valid(self, form):
         pk = str(self.object.pk)
@@ -171,7 +183,7 @@ class ClientDetailView(DetailView):
     model = Client
 
 
-class ClientCreateView(LoginRequiredMixin, CreateView):
+class ClientCreateView(PermissionRequiredMixin, LoginRequiredMixin, CreateView):
     login_url = "users:login"
     redirect_field_name = "redirect_to"
     model = Client
@@ -182,6 +194,10 @@ class ClientCreateView(LoginRequiredMixin, CreateView):
     form_class = ClientForm
     success_url = reverse_lazy('mailing:client_list')
 
+    def has_permission(self):
+        user = self.request.user
+        return (not user.is_staff) or (user.is_superuser)
+
     def form_valid(self, form):
         if form.is_valid():
             new_client = form.save(commit=False)
@@ -190,7 +206,7 @@ class ClientCreateView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
-class ClientUpdateView(UpdateView):
+class ClientUpdateView(PermissionRequiredMixin, UpdateView):
     model = Client
     extra_context = {
         'form_name': 'Редактирование',
@@ -199,10 +215,18 @@ class ClientUpdateView(UpdateView):
     form_class = ClientForm
     success_url = reverse_lazy('mailing:client_list')
 
+    def has_permission(self):
+        user = self.request.user
+        return (not user.is_staff) or (user.is_superuser)
 
-class ClientDeleteView(DeleteView):
+
+class ClientDeleteView(PermissionRequiredMixin, DeleteView):
     model = Client
     success_url = reverse_lazy('mailing:client_list')
+
+    def has_permission(self):
+        user = self.request.user
+        return (not user.is_staff) or (user.is_superuser)
 
 
 class MessageListView(ListView):
@@ -224,7 +248,7 @@ class MessageDetailView(DetailView):
     model = MailingMessage
 
 
-class MessageCreateView(LoginRequiredMixin, CreateView):
+class MessageCreateView(PermissionRequiredMixin, LoginRequiredMixin, CreateView):
     login_url = "users:login"
     redirect_field_name = "redirect_to"
     model = MailingMessage
@@ -235,6 +259,10 @@ class MessageCreateView(LoginRequiredMixin, CreateView):
     form_class = MessageForm
     success_url = reverse_lazy('mailing:message_list')
 
+    def has_permission(self):
+        user = self.request.user
+        return (not user.is_staff) or (user.is_superuser)
+
     def form_valid(self, form):
         if form.is_valid():
             new_message = form.save(commit=False)
@@ -243,7 +271,7 @@ class MessageCreateView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
-class MessageUpdateView(UpdateView):
+class MessageUpdateView(PermissionRequiredMixin, UpdateView):
     model = MailingMessage
     extra_context = {
         'form_name': 'Редактирование',
@@ -252,10 +280,18 @@ class MessageUpdateView(UpdateView):
     form_class = MessageForm
     success_url = reverse_lazy('mailing:message_list')
 
+    def has_permission(self):
+        user = self.request.user
+        return (not user.is_staff) or (user.is_superuser)
 
-class MessageDeleteView(DeleteView):
+
+class MessageDeleteView(PermissionRequiredMixin, DeleteView):
     model = MailingMessage
     success_url = reverse_lazy('mailing:message_list')
+
+    def has_permission(self):
+        user = self.request.user
+        return (not user.is_staff) or (user.is_superuser)
 
 
 class LogListView(ListView):
