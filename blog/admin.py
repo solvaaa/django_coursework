@@ -1,7 +1,6 @@
 from django.contrib import admin
 
 from blog.models import BlogPost
-from mailing.models import Mailing
 
 
 # Register your models here.
