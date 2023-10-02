@@ -8,7 +8,7 @@ from django.views import View
 from django.views.generic import TemplateView, ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.conf import settings
 from django_apscheduler.jobstores import DjangoJobStore, register_job
-from mailing.scheduler import scheduler, send_email_job
+from mailing.scheduler import scheduler, send_email_job, start_job, remove_job
 
 from mailing.forms import MailingForm, ClientForm, MessageForm
 from mailing.models import Mailing, Client, MailingMessage, MailingLogs
@@ -56,36 +56,15 @@ class MailingCreateView(PermissionRequiredMixin, LoginRequiredMixin, CreateView)
             new_mailing.status = 'START'
             new_mailing.save()
 
-            frequencies = {
-                'ONCE': 'ONCE',
-                'DAILY': 'DAILY',
-                'WEEKLY': 'WEEKLY',
-                'MONTHLY': 'MONTHLY'
-            }
-
             response = super().form_valid(form)
             job_id = str(form.instance.pk)
             time = form.cleaned_data['mailing_time']
             frequency = form.cleaned_data['frequency']
-            scheduler_frequency = frequencies[frequency]
             message = form.instance.message
             email_list = []
-            scheduler_args = [
-                job_id,
-                scheduler_frequency,
-                message.subject,
-                message.body
-            ]
             for client in form.cleaned_data['clients']:
                 email_list.append(client.email)
-            scheduler.add_job(
-                send_email_job,
-                args=scheduler_args,
-                trigger=CronTrigger(second="*/10"),  # Every 10 seconds
-                id=job_id,  # The `id` assigned to each job MUST be unique
-                max_instances=1,
-                replace_existing=True,
-            )
+            start_job(job_id, time, frequency, message, email_list)
         return super().form_valid(form)
 
     def get_form_kwargs(self):
@@ -109,37 +88,17 @@ class MailingUpdateView(PermissionRequiredMixin, UpdateView):
 
     def form_valid(self, form):
         if form.is_valid():
-            frequencies = {
-                'ONCE': 'ONCE',
-                'DAILY': 'DAILY',
-                'WEEKLY': 'WEEKLY',
-                'MONTHLY': 'MONTHLY'
-            }
 
             response = super().form_valid(form)
             job_id = str(form.instance.pk)
             time = form.cleaned_data['mailing_time']
             frequency = form.cleaned_data['frequency']
-            scheduler_frequency = frequencies[frequency]
             message = form.instance.message
             email_list = []
-            scheduler_args = [
-                job_id,
-                scheduler_frequency,
-                message.subject,
-                message.body
-            ]
             for client in form.cleaned_data['clients']:
                 email_list.append(client.email)
-            scheduler.remove_job(job_id)
-            scheduler.add_job(
-                send_email_job,
-                args=scheduler_args,
-                trigger=CronTrigger(second="*/10"),  # Every 10 seconds
-                id=job_id,  # The `id` assigned to each job MUST be unique
-                max_instances=1,
-                replace_existing=True,
-            )
+            remove_job(job_id)
+            start_job(job_id, time, frequency, message, email_list)
         return super().form_valid(form)
 
     def get_form_kwargs(self):
@@ -175,6 +134,10 @@ class MailingStopView(PermissionRequiredMixin, View):
         mailing = Mailing.objects.get(pk=pk)
         mailing.status = 'FIN'
         mailing.save()
+        try:
+            scheduler.remove_job(job_id=str(pk))
+        except apscheduler.jobstores.base.JobLookupError:
+            print(f'job {pk} not found')
         return redirect('mailing:mailing_list')
 
 

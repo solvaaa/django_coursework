@@ -14,8 +14,12 @@ class MailingForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields["clients"].widget = forms.widgets.CheckboxSelectMultiple()
         if self.user.is_authenticated:
-            clients = Client.objects.filter(user=self.user)
-            messages = MailingMessage.objects.filter(user=self.user)
+            if self.user.is_superuser:
+                clients = Client.objects.all()
+                messages = MailingMessage.objects.all()
+            else:
+                clients = Client.objects.filter(user=self.user)
+                messages = MailingMessage.objects.filter(user=self.user)
         else:
             clients = Client.objects.none()
             messages = MailingMessage.objects.none()

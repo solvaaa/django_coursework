@@ -15,7 +15,7 @@ import config.settings as settings
 from users.forms import UserRegisterForm
 
 from users.forms import UserProfileForm
-
+from users.services import remove_jobs_by_user, add_jobs_by_user
 
 UID_CONST = 27934
 
@@ -119,4 +119,8 @@ class UserBlockView(PermissionRequiredMixin, View):
         print(user)
         user.is_active = not user.is_active
         user.save()
+        if user.is_active:
+            add_jobs_by_user(uid)
+        else:
+            remove_jobs_by_user(uid)
         return redirect('users:user_list')

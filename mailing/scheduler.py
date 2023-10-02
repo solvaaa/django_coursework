@@ -30,6 +30,15 @@ def delete_old_job_executions(max_age=604_800):
 def start():
 
     scheduler.add_jobstore(DjangoJobStore(), "default")
+    '''scheduler.add_job(
+      delete_old_job_executions,
+      trigger=CronTrigger(
+        day_of_week="mon", hour="00", minute="00"
+      ),  # Midnight on Monday, before start of the next work week.
+      id="delete_old_job_executions",
+      max_instances=1,
+      replace_existing=True,
+    )'''
     try:
         print("Starting scheduler...")
         scheduler.start()
@@ -50,3 +59,34 @@ def send_email_job(job_id, scheduler_frequency, subject, body):
         mailing.status = 'FIN'
         mailing.save()
 
+
+def start_job(job_id, time, frequency, message, email_list):
+    frequencies = {
+        'ONCE': 'ONCE',
+        'DAILY': 'DAILY',
+        'WEEKLY': 'WEEKLY',
+        'MONTHLY': 'MONTHLY'
+    }
+    job_id = str(job_id)
+    scheduler_frequency = frequencies[frequency]
+    scheduler_args = [
+        job_id,
+        scheduler_frequency,
+        message.subject,
+        message.body
+    ]
+    scheduler.add_job(
+        send_email_job,
+        args=scheduler_args,
+        trigger=CronTrigger(second="*/10"),  # Every 10 seconds
+        id=job_id,  # The `id` assigned to each job MUST be unique
+        max_instances=1,
+        replace_existing=True,
+    )
+
+
+def remove_job(job_id):
+    try:
+        scheduler.remove_job(job_id)
+    except JobLookupError:
+        print(f'job {job_id} not found')
