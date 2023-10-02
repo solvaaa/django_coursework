@@ -173,10 +173,8 @@ class MailingStopView(PermissionRequiredMixin, View):
 
     def get(self, request, pk):
         mailing = Mailing.objects.get(pk=pk)
-        print(mailing.status)
         mailing.status = 'FIN'
         mailing.save()
-        print(mailing.status)
         return redirect('mailing:mailing_list')
 
 

@@ -1,3 +1,4 @@
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.shortcuts import render
 
 # Create your views here.
@@ -7,7 +8,7 @@ from django.shortcuts import redirect
 from django.urls import reverse_lazy, reverse
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from django.views.generic import CreateView, UpdateView, TemplateView, View
+from django.views.generic import CreateView, UpdateView, TemplateView, View, ListView
 from users.models import User
 import config.settings as settings
 
@@ -92,3 +93,30 @@ class PasswordResetView(TemplateView):
             return redirect('users:login')
         else:
             return redirect('/')
+
+
+class UserListView(PermissionRequiredMixin, ListView):
+    model = User
+
+    def has_permission(self):
+        user = self.request.user
+        return user.is_staff
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset.filter(is_staff=False)
+
+
+class UserBlockView(PermissionRequiredMixin, View):
+
+    def has_permission(self):
+        user = self.request.user
+        return user.is_staff
+
+    def get(self, request, uid):
+        print('DEBUG', uid)
+        user = User.objects.get(pk=uid)
+        print(user)
+        user.is_active = not user.is_active
+        user.save()
+        return redirect('users:user_list')

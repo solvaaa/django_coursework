@@ -1,0 +1,39 @@
+{% extends 'mailing/base.html' %}
+{% block content %}
+<div class="row text-center">
+    <div class="col-12">
+        <div class="card mb-4 box-shadow">
+            <div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+                <h1 class="display-4">TestStore</h1>
+                <p class="lead">TestStore - лучший магазин testa</p>
+            </div>
+            <div class="col-12">
+                <a href="{% url 'mailing:mailing_create' %}"
+                   class="btn btn-sm btn-outline-secondary">Create mailing</a>
+            </div>
+            {% for object in object_list %}
+                <div class="card-body">
+                    <h4 class="card-title pricing-card-title">{{ object.email }}</h4>
+                    <p>{{ object.first_name }} {{ object.last_name }}</p>
+                    {% if object.is_active %}
+                        <p>Активен</p>
+                    {% else %}
+                        <p>Заблокирован</p>
+                    {% endif %}
+                    <div class="btn-group">
+                        <a href="{% url 'users:user_block' object.pk %}"
+                            class="btn btn-sm btn-outline-secondary" type="button">
+                                {% if object.is_active %}
+                                    Заблокировать
+                                {% else %}
+                                    Разблокировать
+                                {% endif %}
+                        </a>
+                    </div>
+                </div>
+
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
