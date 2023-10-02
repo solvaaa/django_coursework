@@ -20,5 +20,12 @@
                class="btn btn-sm btn-outline-secondary" type="button">Delete</a>
         </div>
     </div>
+{% else %}
+    <div class="card-footer">
+        <div class="btn-group">
+            <a href="{% url 'mailing:mailing_stop' object.pk %}"
+               class="btn btn-sm btn-outline-secondary" type="button">Stop</a>
+        </div>
+    </div>
 {% endif %}
 {% endblock %}

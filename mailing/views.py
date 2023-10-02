@@ -2,8 +2,9 @@ import apscheduler.jobstores.base
 from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.triggers.cron import CronTrigger
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
+from django.views import View
 from django.views.generic import TemplateView, ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.conf import settings
 from django_apscheduler.jobstores import DjangoJobStore, register_job
@@ -162,6 +163,21 @@ class MailingDeleteView(PermissionRequiredMixin, DeleteView):
         except apscheduler.jobstores.base.JobLookupError:
             print(f'job {pk} not found')
         return super().form_valid(form)
+
+
+class MailingStopView(PermissionRequiredMixin, View):
+
+    def has_permission(self):
+        user = self.request.user
+        return user.is_staff
+
+    def get(self, request, pk):
+        mailing = Mailing.objects.get(pk=pk)
+        print(mailing.status)
+        mailing.status = 'FIN'
+        mailing.save()
+        print(mailing.status)
+        return redirect('mailing:mailing_list')
 
 
 class ClientListView(ListView):
