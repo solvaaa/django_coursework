@@ -5,12 +5,10 @@ from django.urls import reverse_lazy
 from django.views.generic import TemplateView, ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.conf import settings
 from django_apscheduler.jobstores import DjangoJobStore, register_job
-from mailing.scheduler import scheduler
+from mailing.scheduler import scheduler, send_email_job
 
 from mailing.forms import MailingForm, ClientForm, MessageForm
 from mailing.models import Mailing, Client, MailingMessage, MailingLogs
-
-from mailing.services import send_email
 
 
 # Create your views here.
@@ -52,13 +50,15 @@ class MailingCreateView(CreateView):
             message = form.instance.message
             email_list = []
             scheduler_args = [
+                job_id,
+                scheduler_frequency,
                 message.subject,
                 message.body
             ]
             for client in form.cleaned_data['clients']:
                 email_list.append(client.email)
             scheduler.add_job(
-                send_email,
+                send_email_job,
                 args=scheduler_args,
                 trigger=CronTrigger(second="*/10"),  # Every 10 seconds
                 id=job_id,  # The `id` assigned to each job MUST be unique
@@ -76,6 +76,41 @@ class MailingUpdateView(UpdateView):
     }
     form_class = MailingForm
     success_url = reverse_lazy('mailing:mailing_list')
+
+    def form_valid(self, form):
+        if form.is_valid():
+            frequencies = {
+                'ONCE': 'ONCE',
+                'DAILY': 'DAILY',
+                'WEEKLY': 'WEEKLY',
+                'MONTHLY': 'MONTHLY'
+            }
+
+            response = super().form_valid(form)
+            job_id = str(form.instance.pk)
+            time = form.cleaned_data['mailing_time']
+            frequency = form.cleaned_data['frequency']
+            scheduler_frequency = frequencies[frequency]
+            message = form.instance.message
+            email_list = []
+            scheduler_args = [
+                job_id,
+                scheduler_frequency,
+                message.subject,
+                message.body
+            ]
+            for client in form.cleaned_data['clients']:
+                email_list.append(client.email)
+            scheduler.remove_job(job_id)
+            scheduler.add_job(
+                send_email_job,
+                args=scheduler_args,
+                trigger=CronTrigger(second="*/10"),  # Every 10 seconds
+                id=job_id,  # The `id` assigned to each job MUST be unique
+                max_instances=1,
+                replace_existing=True,
+            )
+        return super().form_valid(form)
 
 
 class MailingDeleteView(DeleteView):

@@ -7,6 +7,9 @@ from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.triggers.cron import CronTrigger
 from django_apscheduler.jobstores import DjangoJobStore
 from django_apscheduler.models import DjangoJobExecution
+from mailing.models import Mailing
+
+
 
 scheduler = BackgroundScheduler(timezone=settings.TIME_ZONE)
 
@@ -26,7 +29,6 @@ def delete_old_job_executions(max_age=604_800):
 def start():
 
     scheduler.add_jobstore(DjangoJobStore(), "default")
-    DjangoJobStore().remove_job(job_id='30')
     try:
         print("Starting scheduler...")
         scheduler.start()
@@ -34,3 +36,13 @@ def start():
         print("Stopping scheduler...")
         scheduler.shutdown()
         print("Scheduler shut down successfully!")
+
+
+def send_email_job(job_id, scheduler_frequency, subject, body):
+    print(f'{subject}, {body}')
+    if scheduler_frequency == 'ONCE':
+        scheduler.remove_job(job_id=job_id)
+    mailing = Mailing.objects.get(pk=job_id)
+    print(mailing)
+    mailing.status = 'FIN'
+    mailing.save()
