@@ -82,6 +82,7 @@ class PasswordResetView(TemplateView):
             user.set_password(
                 password
             )
+            user.save()
             send_mail(
                 subject='Сброс пароля',
                 message=f'Ваш новый пароль:\n{password}',
