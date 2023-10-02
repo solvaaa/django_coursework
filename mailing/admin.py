@@ -5,21 +5,23 @@ import mailing.models as model
 
 @admin.register(model.Client)
 class ClientAdmin(admin.ModelAdmin):
-    list_display = ('email', 'name')
+    list_display = ('email', 'name', 'user')
     search_fields = ('email', 'name', 'comment')
+    readonly_fields = ('user', )
 
 
 @admin.register(model.Mailing)
 class MailingAdmin(admin.ModelAdmin):
-    list_display = ('mailing_time', 'frequency', 'status')
-    readonly_fields = ('status', )
+    list_display = ('mailing_time', 'frequency', 'status', 'user')
+    readonly_fields = ('status', 'user')
     list_filter = ('frequency', 'status')
 
 
 @admin.register(model.MailingMessage)
 class MessageAdmin(admin.ModelAdmin):
-    list_display = ('subject', )
+    list_display = ('subject', 'user')
     search_fields = ('subject', 'body')
+    readonly_fields = ('user', )
 
 
 @admin.register(model.MailingLogs)

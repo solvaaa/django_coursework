@@ -7,7 +7,7 @@ class MailingForm(forms.ModelForm):
     class Meta:
         model = Mailing
         fields = '__all__'
-        exclude = ('status', )
+        exclude = ('status', 'user', )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -20,6 +20,7 @@ class ClientForm(forms.ModelForm):
     class Meta:
         model = Client
         fields = '__all__'
+        exclude = ('user', )
 
 
 class MessageForm(forms.ModelForm):
@@ -27,3 +28,4 @@ class MessageForm(forms.ModelForm):
     class Meta:
         model = MailingMessage
         fields = '__all__'
+        exclude = ('user', )
