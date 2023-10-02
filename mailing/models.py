@@ -1,4 +1,5 @@
 from django.db import models
+from users.models import User
 
 # Create your models here.
 NULLABLE = {'blank': True, 'null': True}
@@ -8,6 +9,7 @@ class Client(models.Model):
     email = models.EmailField(max_length=100, verbose_name='e-mail')
     name = models.CharField(max_length=100, verbose_name='ФИО', **NULLABLE)
     comment = models.CharField(max_length=100, verbose_name='комментарий', **NULLABLE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="пользователь", **NULLABLE)
 
     def __str__(self):
         return f'{self.email} - {self.name}'
@@ -46,6 +48,7 @@ class Mailing(models.Model):
                               default=CREATED, verbose_name='статус')
     message = models.ForeignKey("MailingMessage", on_delete=models.CASCADE)
     clients = models.ManyToManyField('Client', through='MailingClient', verbose_name='клиенты')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="пользователь")
 
     def __str__(self):
         return f'{self.pk} {self.status}'
@@ -58,6 +61,7 @@ class Mailing(models.Model):
 class MailingMessage(models.Model):
     subject = models.CharField(max_length=200, verbose_name='тема')
     body = models.TextField(verbose_name='тело', **NULLABLE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="пользователь")
 
     def __str__(self):
         return f'{self.subject}'
@@ -70,7 +74,7 @@ class MailingMessage(models.Model):
 class MailingLogs(models.Model):
     attempt_time = models.DateTimeField(verbose_name='время попытки')
     attempt_status = models.BooleanField(default=False, verbose_name='статус')
-    server_response = models.CharField(max_length=50, verbose_name='ответ сервера', **NULLABLE)
+    server_response = models.CharField(max_length=50, verbose_name='ответ сервера')
     mailing = models.ForeignKey("Mailing", on_delete=models.CASCADE)
 
     def __str__(self):

@@ -7,5 +7,5 @@ class MailingConfig(AppConfig):
 
     def ready(self):
         from mailing import scheduler
-        scheduler.start()
+        #scheduler.start()
         return super().ready()
