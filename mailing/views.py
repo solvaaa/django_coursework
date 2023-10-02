@@ -1,6 +1,7 @@
 import apscheduler.jobstores.base
 from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.triggers.cron import CronTrigger
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView, ListView, DetailView, CreateView, UpdateView, DeleteView
@@ -19,19 +20,22 @@ class MailingListView(ListView):
     def get_queryset(self, *args, **kwargs):
         queryset = super().get_queryset(*args, **kwargs)
         current_user = self.request.user
-        print('DEBUG', type(current_user))
         if current_user.is_authenticated:
-            queryset = queryset.filter(user=self.request.user)
+            if current_user.is_staff or current_user.is_superuser:
+                return queryset
+            else:
+                return queryset.filter(user=current_user)
         else:
-            queryset = queryset.none()
-        return queryset
+            return queryset.none()
 
 
 class MailingDetailView(DetailView):
     model = Mailing
 
 
-class MailingCreateView(CreateView):
+class MailingCreateView(LoginRequiredMixin, CreateView):
+    login_url = "users:login"
+    redirect_field_name = "redirect_to"
     model = Mailing
     extra_context = {
         'form_name': 'Добавление',
@@ -39,7 +43,6 @@ class MailingCreateView(CreateView):
     }
     form_class = MailingForm
     success_url = reverse_lazy('mailing:mailing_list')
-
 
     def form_valid(self, form):
         if form.is_valid():
@@ -79,6 +82,11 @@ class MailingCreateView(CreateView):
                 replace_existing=True,
             )
         return super().form_valid(form)
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({'user': self.request.user})
+        return kwargs
 
 
 class MailingUpdateView(UpdateView):
@@ -125,6 +133,11 @@ class MailingUpdateView(UpdateView):
             )
         return super().form_valid(form)
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({'user': self.request.user})
+        return kwargs
+
 
 class MailingDeleteView(DeleteView):
     model = Mailing
@@ -142,12 +155,25 @@ class MailingDeleteView(DeleteView):
 class ClientListView(ListView):
     model = Client
 
+    def get_queryset(self, *args, **kwargs):
+        queryset = super().get_queryset(*args, **kwargs)
+        current_user = self.request.user
+        if current_user.is_authenticated:
+            if current_user.is_staff or current_user.is_superuser:
+                return queryset
+            else:
+                return queryset.filter(user=current_user)
+        else:
+            return queryset.none()
+
 
 class ClientDetailView(DetailView):
     model = Client
 
 
-class ClientCreateView(CreateView):
+class ClientCreateView(LoginRequiredMixin, CreateView):
+    login_url = "users:login"
+    redirect_field_name = "redirect_to"
     model = Client
     extra_context = {
         'form_name': 'Добавление',
@@ -182,12 +208,25 @@ class ClientDeleteView(DeleteView):
 class MessageListView(ListView):
     model = MailingMessage
 
+    def get_queryset(self, *args, **kwargs):
+        queryset = super().get_queryset(*args, **kwargs)
+        current_user = self.request.user
+        if current_user.is_authenticated:
+            if current_user.is_staff or current_user.is_superuser:
+                return queryset
+            else:
+                return queryset.filter(user=current_user)
+        else:
+            return queryset.none()
+
 
 class MessageDetailView(DetailView):
     model = MailingMessage
 
 
-class MessageCreateView(CreateView):
+class MessageCreateView(LoginRequiredMixin, CreateView):
+    login_url = "users:login"
+    redirect_field_name = "redirect_to"
     model = MailingMessage
     extra_context = {
         'form_name': 'Добавление',
@@ -221,6 +260,17 @@ class MessageDeleteView(DeleteView):
 
 class LogListView(ListView):
     model = MailingLogs
+
+    def get_queryset(self, *args, **kwargs):
+        queryset = super().get_queryset(*args, **kwargs)
+        current_user = self.request.user
+        if current_user.is_authenticated:
+            if current_user.is_staff or current_user.is_superuser:
+                return queryset
+            else:
+                return queryset.filter(mailing__user=current_user)
+        else:
+            return queryset.none()
 
 
 class LogDetailView(DetailView):

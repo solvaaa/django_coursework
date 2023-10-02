@@ -15,6 +15,9 @@
                 <div class="card-body">
                     <h4 class="card-title pricing-card-title">{{ object.name }}</h4>
                     <p>{{ object.email }}</p>
+                    {% if user.is_staff %}
+                        <p>создано: {{ object.user }}</p>
+                    {% endif %}
                     <div class="btn-group">
                         <a href="{% url 'mailing:client_detail' object.pk %}"
                             class="btn btn-sm btn-outline-secondary" type="button">View</a>

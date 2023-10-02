@@ -10,9 +10,17 @@ class MailingForm(forms.ModelForm):
         exclude = ('status', 'user', )
 
     def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
         self.fields["clients"].widget = forms.widgets.CheckboxSelectMultiple()
-        self.fields["clients"].queryset = Client.objects.all()
+        if self.user.is_authenticated:
+            clients = Client.objects.filter(user=self.user)
+            messages = MailingMessage.objects.filter(user=self.user)
+        else:
+            clients = Client.objects.none()
+            messages = MailingMessage.objects.none()
+        self.fields["clients"].queryset = clients
+        self.fields["message"].queryset = messages
 
 
 class ClientForm(forms.ModelForm):

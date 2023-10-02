@@ -17,6 +17,9 @@
                     <p>{{ object.message }}</p>
                     <p>{{ object.status }}</p>
                     <p>{{ object.mailing_time }}</p>
+                    {% if user.is_staff %}
+                        <p>создано: {{ object.user }}</p>
+                    {% endif %}
                     <div class="btn-group">
                         <a href="{% url 'mailing:mailing_detail' object.pk %}"
                             class="btn btn-sm btn-outline-secondary" type="button">View</a>
