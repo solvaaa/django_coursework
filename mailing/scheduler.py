@@ -3,6 +3,7 @@ import logging
 from apscheduler.schedulers.background import BackgroundScheduler
 from django.conf import settings
 
+from apscheduler.jobstores.base import JobLookupError
 from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.triggers.cron import CronTrigger
 from django_apscheduler.jobstores import DjangoJobStore
@@ -41,8 +42,11 @@ def start():
 def send_email_job(job_id, scheduler_frequency, subject, body):
     print(f'{subject}, {body}')
     if scheduler_frequency == 'ONCE':
-        scheduler.remove_job(job_id=job_id)
-    mailing = Mailing.objects.get(pk=job_id)
-    print(mailing)
-    mailing.status = 'FIN'
-    mailing.save()
+        try:
+            scheduler.remove_job(job_id=job_id)
+        except JobLookupError:
+            print(f'job {job_id} not found')
+        mailing = Mailing.objects.get(pk=job_id)
+        mailing.status = 'FIN'
+        mailing.save()
+

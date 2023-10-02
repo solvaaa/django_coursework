@@ -1,3 +1,4 @@
+import apscheduler.jobstores.base
 from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.triggers.cron import CronTrigger
 from django.shortcuts import render
@@ -116,6 +117,14 @@ class MailingUpdateView(UpdateView):
 class MailingDeleteView(DeleteView):
     model = Mailing
     success_url = reverse_lazy('mailing:mailing_list')
+
+    def form_valid(self, form):
+        pk = str(self.object.pk)
+        try:
+            scheduler.remove_job(job_id=pk)
+        except apscheduler.jobstores.base.JobLookupError:
+            print(f'job {pk} not found')
+        return super().form_valid(form)
 
 
 class ClientListView(ListView):
