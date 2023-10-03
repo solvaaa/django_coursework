@@ -131,11 +131,7 @@ class MailingDeleteView(PermissionRequiredMixin, DeleteView):
         return super().form_valid(form)
 
 
-class MailingStopView(PermissionRequiredMixin, View):
-
-    def has_permission(self):
-        user = self.request.user
-        return user.is_staff
+class MailingStopView(View):
 
     def get(self, request, pk):
         mailing = Mailing.objects.get(pk=pk)

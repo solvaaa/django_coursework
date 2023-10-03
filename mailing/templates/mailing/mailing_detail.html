@@ -12,21 +12,17 @@
         <p>создано: {{ object.user }}</p>
     {% endif %}
 </div>
-{% if not user.is_staff or user.is_superuser %}
     <div class="card-footer">
         <div class="btn-group">
-            <a href="{% url 'mailing:mailing_edit' object.pk %}"
-               class="btn btn-sm btn-outline-secondary" type="button">Edit</a>
-            <a href="{% url 'mailing:mailing_delete' object.pk %}"
-               class="btn btn-sm btn-outline-secondary" type="button">Delete</a>
-        </div>
-    </div>
-{% else %}
-    <div class="card-footer">
-        <div class="btn-group">
+            {% if not user.is_staff or user.is_superuser %}
+                <a href="{% url 'mailing:mailing_edit' object.pk %}"
+                   class="btn btn-sm btn-outline-secondary" type="button">Edit</a>
+                <a href="{% url 'mailing:mailing_delete' object.pk %}"
+                   class="btn btn-sm btn-outline-secondary" type="button">Delete</a>
+            {% endif %}
             <a href="{% url 'mailing:mailing_stop' object.pk %}"
                class="btn btn-sm btn-outline-secondary" type="button">Stop</a>
         </div>
     </div>
-{% endif %}
+
 {% endblock %}
