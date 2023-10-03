@@ -16,7 +16,7 @@ class ClientAdmin(admin.ModelAdmin):
 @admin.register(model.Mailing)
 class MailingAdmin(admin.ModelAdmin):
     list_display = ('name', 'mailing_time', 'frequency', 'status', 'user')
-    readonly_fields = ('user', )
+    readonly_fields = ('user', 'status')
     list_filter = ('frequency', 'status')
 
     def delete_model(self, request, obj):
