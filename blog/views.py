@@ -33,7 +33,7 @@ class IndexView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         queryset = get_mailings()
-        context['total_mailings'] = queryset
+        context['total_mailings'] = queryset.count()
         context['active_mailings'] = queryset.filter(status='START').count()
         context['unique_clients'] = Client.objects.distinct().count()
         return context
