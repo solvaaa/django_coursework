@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from django.conf import settings
@@ -10,9 +11,7 @@ from django_apscheduler.jobstores import DjangoJobStore
 from django_apscheduler.models import DjangoJobExecution
 
 from config.settings import SCHEDULER_ADD_CLEANING_JOB
-from mailing.models import Mailing
-
-
+from mailing.models import Mailing, MailingLogs
 
 scheduler = BackgroundScheduler(timezone=settings.TIME_ZONE)
 
@@ -53,6 +52,17 @@ def start():
 
 def send_email_job(job_id, scheduler_frequency, subject, body):
     print(f'{subject}, {body}')
+
+    attempt_time = datetime.today()
+    attempt_status = True
+    server_response = '200'
+    mailing = Mailing.objects.get(pk=int(job_id))
+
+    MailingLogs.objects.create(attempt_time=attempt_time,
+                               attempt_status=attempt_status,
+                               server_response=server_response,
+                               mailing=mailing)
+
     if scheduler_frequency == 'ONCE':
         try:
             scheduler.remove_job(job_id=job_id)
@@ -81,7 +91,7 @@ def start_job(job_id, time, frequency, message, email_list):
     scheduler.add_job(
         send_email_job,
         args=scheduler_args,
-        trigger=CronTrigger(second="*/10"),  # Every 10 seconds
+        trigger=CronTrigger(second="*/20"),  # Every 10 seconds
         id=job_id,  # The `id` assigned to each job MUST be unique
         max_instances=1,
         replace_existing=True,
