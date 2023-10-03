@@ -1,4 +1,5 @@
 from django import forms
+
 from mailing.models import Mailing, Client, MailingMessage
 
 
@@ -12,7 +13,10 @@ class MailingForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
+
         self.fields["clients"].widget = forms.widgets.CheckboxSelectMultiple()
+        self.fields['mailing_time'].widget = forms.widgets.TimeInput()
+
         if self.user.is_authenticated:
             if self.user.is_superuser:
                 clients = Client.objects.all()
@@ -23,6 +27,7 @@ class MailingForm(forms.ModelForm):
         else:
             clients = Client.objects.none()
             messages = MailingMessage.objects.none()
+
         self.fields["clients"].queryset = clients
         self.fields["message"].queryset = messages
 

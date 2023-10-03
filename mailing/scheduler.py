@@ -1,17 +1,18 @@
-import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.date import DateTrigger
+from apscheduler.triggers.interval import IntervalTrigger
 from django.conf import settings
 
 from apscheduler.jobstores.base import JobLookupError
-from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.triggers.cron import CronTrigger
 from django_apscheduler.jobstores import DjangoJobStore
 from django_apscheduler.models import DjangoJobExecution
 
 from config.settings import SCHEDULER_ADD_CLEANING_JOB
 from mailing.models import Mailing, MailingLogs
+from mailing.services import get_next_datetime
 
 scheduler = BackgroundScheduler(timezone=settings.TIME_ZONE)
 
@@ -64,10 +65,6 @@ def send_email_job(job_id, scheduler_frequency, subject, body):
                                mailing=mailing)
 
     if scheduler_frequency == 'ONCE':
-        try:
-            scheduler.remove_job(job_id=job_id)
-        except JobLookupError:
-            print(f'job {job_id} not found')
         mailing = Mailing.objects.get(pk=job_id)
         mailing.status = 'FIN'
         mailing.save()
@@ -88,10 +85,24 @@ def start_job(job_id, time, frequency, message, email_list):
         message.subject,
         message.body
     ]
+    if frequency == 'ONCE':
+        trigger = DateTrigger(run_date=get_next_datetime(time))
+    else:
+        if frequency == 'DAILY':
+            interval = {'days': 1}
+        elif frequency == 'WEEKLY':
+            interval = {'weeks': 1}
+        elif frequency == 'MONTHLY':
+            interval = {'days': 30}
+        else:
+            interval = {}
+        interval['start_date'] = get_next_datetime(time) - timedelta(days=1)
+        trigger = IntervalTrigger(**interval)
+
     scheduler.add_job(
         send_email_job,
         args=scheduler_args,
-        trigger=CronTrigger(second="*/20"),  # Every 10 seconds
+        trigger=trigger,  # Every 10 seconds
         id=job_id,  # The `id` assigned to each job MUST be unique
         max_instances=1,
         replace_existing=True,
