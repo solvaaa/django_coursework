@@ -7,6 +7,7 @@ from django.conf import settings
 
 from apscheduler.jobstores.base import JobLookupError
 from apscheduler.triggers.cron import CronTrigger
+from django.core.mail import send_mail
 from django_apscheduler.jobstores import DjangoJobStore
 from django_apscheduler.models import DjangoJobExecution
 
@@ -53,7 +54,7 @@ def start():
         print("Scheduler shut down successfully!")
 
 
-def send_email_job(job_id, scheduler_frequency, subject, body):
+def send_email_job(job_id, scheduler_frequency, subject, body, email_list):
     print(f'{subject}, {body}')
 
     attempt_time = datetime.today()
@@ -71,6 +72,13 @@ def send_email_job(job_id, scheduler_frequency, subject, body):
         mailing.status = 'FIN'
         mailing.save()
 
+    send_mail(
+        subject=subject,
+        message=body,
+        from_email=settings.EMAIL_HOST_USER,
+        recipient_list=email_list
+    )
+
 
 def start_job(job_id, time, frequency, message, email_list):
     frequencies = {
@@ -85,7 +93,8 @@ def start_job(job_id, time, frequency, message, email_list):
         job_id,
         scheduler_frequency,
         message.subject,
-        message.body
+        message.body,
+        email_list
     ]
     if frequency == 'ONCE':
         trigger = DateTrigger(run_date=get_next_datetime(time))
