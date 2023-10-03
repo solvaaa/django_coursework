@@ -10,7 +10,6 @@ from apscheduler.triggers.cron import CronTrigger
 from django_apscheduler.jobstores import DjangoJobStore
 from django_apscheduler.models import DjangoJobExecution
 
-from config.settings import SCHEDULER_ADD_CLEANING_JOB
 from mailing.models import Mailing, MailingLogs
 from mailing.services import get_next_datetime
 
