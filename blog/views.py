@@ -2,7 +2,7 @@ from django.views.generic import ListView, DetailView
 
 from blog.models import BlogPost
 from blog.services import get_blogposts, get_mailings
-from mailing.models import Mailing, Client
+from mailing.models import Client
 
 
 # Create your views here.
@@ -37,5 +37,3 @@ class IndexView(ListView):
         context['active_mailings'] = queryset.filter(status='START').count()
         context['unique_clients'] = Client.objects.distinct().count()
         return context
-
-

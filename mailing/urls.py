@@ -30,5 +30,4 @@ urlpatterns = [
 
     path('log/list', LogListView.as_view(), name='log_list'),
     path('log/<int:pk>', LogDetailView.as_view(), name='log_detail'),
-
 ]

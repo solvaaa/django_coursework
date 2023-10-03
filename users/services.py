@@ -31,5 +31,3 @@ def add_jobs_by_user(uid):
         for client in mailing.clients.all():
             email_list.append(client.email)
         start_job(job_id, time, frequency, message, email_list)
-
-

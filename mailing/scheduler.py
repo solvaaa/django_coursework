@@ -7,7 +7,7 @@ from django.conf import settings
 
 from apscheduler.jobstores.base import JobLookupError
 from apscheduler.triggers.cron import CronTrigger
-from django.core.mail import send_mail, EmailMessage
+from django.core.mail import send_mail
 from django_apscheduler.jobstores import DjangoJobStore
 from django_apscheduler.models import DjangoJobExecution
 
@@ -73,8 +73,8 @@ def send_email_job(job_id, scheduler_frequency, subject, body, email_list):
     else:
         attempt_status = True
         server_response = '200'
-    if send_result == 0:
-        attempt_status = False
+        if send_result == 0:
+            attempt_status = False
 
     attempt_time = datetime.today()
 

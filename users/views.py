@@ -1,13 +1,7 @@
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.shortcuts import render
-
-# Create your views here.
-from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.shortcuts import redirect
-from django.urls import reverse_lazy, reverse
-from django.utils.encoding import force_bytes
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.urls import reverse_lazy
 from django.views.generic import CreateView, UpdateView, TemplateView, View, ListView
 from users.models import User
 import config.settings as settings
