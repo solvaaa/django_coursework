@@ -19,11 +19,14 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 
+from blog.views import IndexView
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('mailing/', include(('mailing.urls', 'mailing'), namespace='mailing')),
     path('users/', include('users.urls', namespace='users')),
-    path('blog/', include(('blog.urls', 'blog'), namespace='blog'))
+    path('blog/', include(('blog.urls', 'blog'), namespace='blog')),
+    path('', IndexView.as_view(), name='index'),
 ]
 
 
