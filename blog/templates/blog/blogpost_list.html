@@ -1,0 +1,27 @@
+{% extends 'mailing/base.html' %}
+{% load my_tags %}
+{% block content %}
+<div class="row text-center">
+    <div class="col-12">
+        <div class="card mb-4 box-shadow">
+            <div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+                {% include 'mailing/includes/inc_servicename.html' %}
+            </div>
+            {% for object in object_list %}
+                <div class="card-body">
+                    <h4 class="card-title pricing-card-title">{{ object.title }}</h4>
+                    <img src="{% mediapath object.image %}" width="600"/>
+                    <p>{{ object.content|truncatechars:200 }}</p>
+                    <p>Опубликовано {{ object.pub_date }}</p>
+                    <p>Просмотры: {{ object.views }}</p>
+                    <div class="btn-group">
+                        <a href="{% url 'blog:blog_detail' object.pk %}"
+                            class="btn btn-sm btn-outline-secondary" type="button">View</a>
+                    </div>
+                </div>
+
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

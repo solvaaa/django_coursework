@@ -7,7 +7,7 @@
         <a class="p-2 btn btn-outline-primary" href="{% url 'mailing:message_list' %}">Сообщения</a>
         <a class="p-2 btn btn-outline-primary" href="{% url 'mailing:client_list' %}">Клиенты</a>
         <span style="color:blue">|</span>
-        <a class="p-2 btn btn-outline-primary" href="">Блог</a>
+        <a class="p-2 btn btn-outline-primary" href="{% url 'blog:blog_list' %}">Блог</a>
         <span style="color:blue">|</span>
         {% if user.is_staff %}
             <a class="p-2 btn btn-outline-primary" href="{% url 'users:user_list' %}">Пользователи</a>
