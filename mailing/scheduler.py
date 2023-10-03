@@ -7,7 +7,7 @@ from django.conf import settings
 
 from apscheduler.jobstores.base import JobLookupError
 from apscheduler.triggers.cron import CronTrigger
-from django.core.mail import send_mail
+from django.core.mail import send_mail, EmailMessage
 from django_apscheduler.jobstores import DjangoJobStore
 from django_apscheduler.models import DjangoJobExecution
 
@@ -55,10 +55,29 @@ def start():
 
 
 def send_email_job(job_id, scheduler_frequency, subject, body, email_list):
-    print(f'{subject}, {body}')
+
+    if scheduler_frequency == 'ONCE':
+        mailing = Mailing.objects.get(pk=job_id)
+        mailing.status = 'FIN'
+        mailing.save()
+    try:
+        send_result = send_mail(
+            subject=subject,
+            message=body,
+            from_email=settings.EMAIL_HOST_USER,
+            recipient_list=email_list
+        )
+    except Exception as e:
+        attempt_status = False
+        server_response = str(e)
+    else:
+        attempt_status = True
+        server_response = '200'
+    if send_result == 0:
+        attempt_status = False
 
     attempt_time = datetime.today()
-    attempt_status = True
+
     server_response = '200'
     mailing = Mailing.objects.get(pk=int(job_id))
 
@@ -66,18 +85,6 @@ def send_email_job(job_id, scheduler_frequency, subject, body, email_list):
                                attempt_status=attempt_status,
                                server_response=server_response,
                                mailing=mailing)
-
-    if scheduler_frequency == 'ONCE':
-        mailing = Mailing.objects.get(pk=job_id)
-        mailing.status = 'FIN'
-        mailing.save()
-
-    send_mail(
-        subject=subject,
-        message=body,
-        from_email=settings.EMAIL_HOST_USER,
-        recipient_list=email_list
-    )
 
 
 def start_job(job_id, time, frequency, message, email_list):
@@ -109,7 +116,6 @@ def start_job(job_id, time, frequency, message, email_list):
             interval = {}
         interval['start_date'] = get_next_datetime(time) - timedelta(days=1)
         trigger = IntervalTrigger(**interval)
-
     scheduler.add_job(
         send_email_job,
         args=scheduler_args,
