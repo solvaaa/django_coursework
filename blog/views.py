@@ -1,6 +1,7 @@
 from django.views.generic import ListView, DetailView
 
 from blog.models import BlogPost
+from blog.services import get_blogposts, get_mailings
 from mailing.models import Mailing, Client
 
 
@@ -25,13 +26,16 @@ class IndexView(ListView):
     model = BlogPost
 
     def get_queryset(self, *args, **kwargs):
-        queryset = super().get_queryset(*args, **kwargs)
+        queryset = get_blogposts()
         queryset = queryset.order_by('?')[:3]
         return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['total_mailings'] = Mailing.objects.all().count()
-        context['active_mailings'] = Mailing.objects.filter(status='START').count()
+        queryset = get_mailings()
+        context['total_mailings'] = queryset
+        context['active_mailings'] = queryset.filter(status='START').count()
         context['unique_clients'] = Client.objects.distinct().count()
         return context
+
+

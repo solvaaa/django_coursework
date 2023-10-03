@@ -2,12 +2,15 @@ import apscheduler.jobstores.base
 from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.triggers.cron import CronTrigger
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.core.cache import cache
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import TemplateView, ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.conf import settings
 from django_apscheduler.jobstores import DjangoJobStore, register_job
+
+from config.settings import CACHE_ENABLED
 from mailing.scheduler import scheduler, send_email_job, start_job, remove_job
 
 from mailing.forms import MailingForm, ClientForm, MessageForm
@@ -65,6 +68,10 @@ class MailingCreateView(PermissionRequiredMixin, LoginRequiredMixin, CreateView)
             for client in form.cleaned_data['clients']:
                 email_list.append(client.email)
             start_job(job_id, time, frequency, message, email_list)
+
+            if CACHE_ENABLED:
+                cache.delete('mailing_list')
+
         return super().form_valid(form)
 
     def get_form_kwargs(self):
@@ -180,6 +187,9 @@ class ClientCreateView(PermissionRequiredMixin, LoginRequiredMixin, CreateView):
             new_client = form.save(commit=False)
             new_client.user = self.request.user
             new_client.save()
+
+            if CACHE_ENABLED:
+                cache.delete('client_list')
         return super().form_valid(form)
 
 
